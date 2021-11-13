@@ -18,7 +18,6 @@ def main():
     # os.makedirs(fullsave_location)
     #sub = np.arange(215)
     #sub = list(sub.astype(str))
-    c = 0
     # print(sub)
     subject_id = ['215','216','217','218']
     dic = {}
