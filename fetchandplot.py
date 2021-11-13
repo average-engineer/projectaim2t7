@@ -11,7 +11,7 @@ def main():
     folder_password = 'CIE_2021'
     oc = owncloud.Client.from_public_link(public_link, folder_password=folder_password)
 
-    save_location = 'C:\\Users\\Neel Savla\\Desktop\\Files\\MS in Germany\\RWTH Aachen\\MME CAME\\MME-CAME_Course_Documents\\Computational Intelligence in Engineering\\Project A\\Generated_Data'
+    save_location = 'C:\\Users\\HP\\OneDrive - Students RWTH Aachen University\\Desktop\\RWTH\\CAME\\ComputationalIntelligenceEngg\\ProjectA\\datadump'
     date_time = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
     fullsave_location = os.path.join (save_location, date_time)
     os.makedirs(fullsave_location)
