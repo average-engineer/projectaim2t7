@@ -19,9 +19,15 @@ def main():
     #sub = np.arange(215)
     #sub = list(sub.astype(str))
     # print(sub)
-    subject_id = ['215','216','217','218']
+    subject_id = ['215','216','217']
     dic = {}
     lsc = []
+    xa = []
+    ya = []
+    za = []
+    xg = []
+    yg = []
+    zg = []
     files = oc.list('/Smartphone3/', depth = 'infinity')
     for file in files:
         if not file.is_dir(): #and sub != 242 :
@@ -38,11 +44,19 @@ def main():
                             csv = pd.read_csv(BytesIO(content))
                             lencsv = len(csv)-1
                             t = csv.iat[lencsv,0]
-                            freq = (float(lencsv)+1.0)/t
-                            lsc.append(freq)
-                            print(gait[1])
-    # print(csv[0])                  
-    # avg_freq = sum(lsc)/len(lsc)
+                            #freq = (float(lencsv)+1.0)/t
+                            #lsc.append(freq)
+                            for k in csv.iterrows():
+                                dat = k[1]
+                                if filename == 'Accelerometer' or filename == 'accelerometer': 
+                                    xa.append(dat[1])
+                                    ya.append(dat[2])
+                                    za.append(dat[3])
+                                else:
+                                    xg.append(dat[1])
+                                    yg.append(dat[2])
+                                    zg.append(dat[3])
+    print(xa,ya,za,xg,yg,zg) 
     # print('\nAverage frequency: ', avg_freq, 'Hz\n')
     # df = pd.DataFrame(dic)
     # print(df) 
