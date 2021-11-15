@@ -20,8 +20,9 @@ def main():
     #sub = list(sub.astype(str))
     # print(sub)
     subject_id = ['215','216','217']
-    dic = {}
     lsc = []
+    gai=[]
+    time=[]
     xa = []
     ya = []
     za = []
@@ -40,12 +41,12 @@ def main():
                     #print(gait)
                     if parent != 'meta':
                         if not re.search(r'red', gait[1]):
-                            content=oc.get_file_contents(file.get_path() + '/' + file.get_name()) 
-                            csv = pd.read_csv(BytesIO(content))
+                            content=oc.get_file_contents(file.get_path() + '/' + file.get_name())
+                            csv = pd.read_csv(BytesIO(content))                           
                             lencsv = len(csv)-1
                             t = csv.iat[lencsv,0]
-                            #freq = (float(lencsv)+1.0)/t
-                            #lsc.append(freq)
+                            freq = (float(lencsv)+1.0)/t
+                            lsc.append(freq)
                             for k in csv.iterrows():
                                 dat = k[1]
                                 if filename == 'Accelerometer' or filename == 'accelerometer': 
@@ -56,10 +57,14 @@ def main():
                                     xg.append(dat[1])
                                     yg.append(dat[2])
                                     zg.append(dat[3])
-    print(xa,ya,za,xg,yg,zg) 
-    # print('\nAverage frequency: ', avg_freq, 'Hz\n')
-    # df = pd.DataFrame(dic)
-    # print(df) 
+
+    dfac = pd.DataFrame({'X(m/s^2)': xa,'Y(m/s^2)': ya,'Z(m/s^2)': za})
+    dfg = pd.DataFrame({'X(rad/s)': xg,'Y(rad/s)': yg,'Z(rad/s)': zg})
+
+    print(dfac) 
+    print(dfg) 
+    #print('\nAverage frequency: ', lsc, 'Hz\n')
+    
 
 if __name__ == '__main__':
     main()
