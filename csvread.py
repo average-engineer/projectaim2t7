@@ -9,6 +9,17 @@ from scipy import signal
 import re
 
 
+## ******************* Desired Output of the Function *************************************
+    # -> Sampling frequencies of all csv files being read
+    # -> Time vectors of all csv files being read
+    # -> X,Y,Z readings of acclerometer sensors for all subject files being read
+    # -> X,Y,Z readings of gyroscope sensors for all subject files being read
+    # -> All data is returned as lists
+
+
+
+
+
 #***************** Structure of the Remote storage of the dataset:**************************
     # Home Folder -> Smartphone1
     #             -> Smartphone2
@@ -20,7 +31,7 @@ import re
 #********************************************************************************************
 
 
-def main(): # All the data parsing happens in a main function
+def csvread(): # All the data parsing happens in a main function
     # Obtaining the datasets from the remote storage (Sceibo)
     public_link = 'https://rwth-aachen.sciebo.de/s/ZpRI67lfqD27VlK?path=%2F'
     folder_password = 'CIE_2021'
@@ -32,9 +43,15 @@ def main(): # All the data parsing happens in a main function
     #sub = np.arange(215)
     #sub = list(sub.astype(str))
     # print(sub)
-    subject_id = ['150','215','216','217'] # list containing the subject numbers as strings
+    subject_id = ['215','216','217'] # list containing the subject numbers as strings
     # subject_id is used to detect the subject #s in the subfolders
-    dic = {} # Empty Dictionary
+    
+    # Initialising an empty directory for obtaining the sampling frequnecy and timevector
+    # of each csv file
+    # In this directory, the sampling frequency of the file as the dictionary key and the 
+    # corresponding timevector of the csv file as the dictionary value
+    freqdic = {} # Empty Dictionary
+    
     lsc = [] # Empty List
     xa = [] # Empty list for storing all X acceleration values
     ya = [] # Empty list for storing all Y acceleration values
@@ -42,6 +59,8 @@ def main(): # All the data parsing happens in a main function
     xg = [] # Empty list for storing all X gyroscope values
     yg = [] # Empty list for storing all X gyroscope values
     zg = [] # Empty list for storing all X gyroscope values
+    
+    
     files = oc.list('/Smartphone3/', depth = 'infinity') # files is a list 
     # Each element of the list files is basically an object which contains info
     # on the files contained in the remote directory we are in
@@ -100,59 +119,109 @@ def main(): # All the data parsing happens in a main function
                             gyrY = np.empty((len(csv),1))
                             gyrZ = np.empty((len(csv),1))
                             
-                            iter = 0 # iterating interger variable
-                            for k in csv.iterrows(): # iterating through the rows of the csv dataframe, k is a tuple (not an integer)
-                            # Structure of k: (<RowIndex#>, Info in all corresponding columns with headers)
-                                dat = k[1] # accessing only the column info (not the row index number)
-                                if filename == 'Accelerometer' or filename == 'accelerometer': 
+                            # Initialising numpy array for the time vector
+                            time = np.empty((len(csv),1)) 
+                            
+                            
+                            # Crude Fix: Check the filename first and then iterate through the csv ross:
+                                # we will have 2 for loops in this case instead of one
+                                
+                            # Desired Structure of the lists
+                            # xa = [{AccX of csv file 1},{AccX of csv file 2},.....,{AccX of csv file n}], n: # csv files
+                            
+                            # checking filename first
+                            if filename == 'Accelerometer' or filename == 'accelerometer':
+                                itera = 0 # iterating interger variable for acceleration values
+                                
+                                
+                                # Iterating through the csv file rows
+                                for k in csv.iterrows(): # iterating through the rows of the csv dataframe, k is a tuple (not an integer)
+                                    # Structure of k: (<RowIndex#>, Info in all corresponding columns with headers)
+                                    dat = k[1] # accessing only the column info (not the row index number)
+                                    # if filename == 'Accelerometer' or filename == 'accelerometer': 
                                     #xa.append(dat[1]) # Adding all Acceleration X data to the empty xa array
                                     #ya.append(dat[2]) # Adding all Acceleration Y data to the empty ya array
                                     #za.append(dat[3]) # Adding all Acceleration Z data to the empty za array
                                     
-                                    accX[iter] = dat[1] # Filling up the acceleration X array
-                                    accY[iter] = dat[2] # Filling up the acceleration Y array
-                                    accZ[iter] = dat[3] # Filling up the acceleration Z array
-                                    iter = iter + 1
+                                    time[itera] = dat[0]
+                                    accX[itera] = dat[1] # Filling up the acceleration X array
+                                    accY[itera] = dat[2] # Filling up the acceleration Y array
+                                    accZ[itera] = dat[3] # Filling up the acceleration Z array
+                                    itera = itera + 1
                                     
                                     
+                                # Appending the Acceleration arrays to the acceleration list
+                                xa.append(accX) # Appending the accleeration X array to the list
+                                ya.append(accY) # Appending the accleeration Y array to the list
+                                za.append(accZ) # Appending the accleeration Z array to the list
+                                
+                                # Populating the dictionary with sampling frequency as the key and timevector as the value
+                                freqdic[samp_freq] = time
                                     
-                                else: # Gyroscope files
+                                    
+                            else: # Gyroscope files
+                                iterg = 0 # iterating interger variable for gyroscope values
+                                
+                                # Iterating through the csv file rows
+                                for k in csv.iterrows():
+                                    dat =  k[1]
                                     #xg.append(dat[1]) # Adding all Gyroscope X data to the empty xg array
                                     #yg.append(dat[2]) # Adding all Gyroscope Y data to the empty yg array
                                     #zg.append(dat[3]) # Adding all Gyroscope Z data to the empty zg array
-                                    gyrX[iter] = dat[1] # Filling up the gyroscope X array
-                                    gyrY[iter] = dat[2] # Filling up the gyrocsope Y array
-                                    gyrZ[iter] = dat[3] # Filling up the gyroscope Z array
-                                    iter = iter + 1
+                                    
+                                    time[iterg] = dat[0]
+                                    gyrX[iterg] = dat[1] # Filling up the gyroscope X array
+                                    gyrY[iterg] = dat[2] # Filling up the gyrocsope Y array
+                                    gyrZ[iterg] = dat[3] # Filling up the gyroscope Z array
+                                    iterg = iterg + 1
+                                    
+                                # Doing the same fr=or the gyroscope data
+                                xg.append(gyrX)
+                                yg.append(gyrY)
+                                zg.append(gyrZ)
+                                    
+                                # Populating the dictionary with sampling frequency as the key and timevector as the value
+                                freqdic[samp_freq] = time                               
                                     
                                     
                             # Once all the arrays are filled, we append these arrays (numpy objects) to the empty
                             # lists defined earlier
-                                    
-                            # Desired Structure of the lists
-                            # xa = [{AccX of csv file 1},{AccX of csv file 2},.....,{AccX of csv file n}], n: # csv files
-                            xa.append(accX) # Appending the accleeration X array to the list
-                            ya.append(accY) # Appending the accleeration Y array to the list
-                            za.append(accZ) # Appending the accleeration Z array to the list
+                            
+                            
+                            # xa.append(accX) # Appending the accleeration X array to the list
+                            # ya.append(accY) # Appending the accleeration Y array to the list
+                            # za.append(accZ) # Appending the accleeration Z array to the list
                             
                             # Doing the same fr=or the gyroscope data
-                            xg.append(gyrX)
-                            yg.append(gyrY)
-                            zg.append(gyrZ)
+                            # xg.append(gyrX)
+                            # yg.append(gyrY)
+                            # zg.append(gyrZ)
                             
     
     
+    # Extracting the values of the dictionaries (time vectors of all csv files) and sotring them in 
+    # a seperate time list
+    timeVecs = list(freqdic.values())
     
-    print(xa[-1]) 
-    print('\n##############################\n')
-    print(accX)
+    # Extracting the keys of the dictionaries (sample frequencies of all csv files) and sotring them in 
+    # a seperate sampling frequencies list
+    sampFreqVec = list(freqdic.keys())
+    
+    
+    
+    # print(sampFreqVec) 
+    # print('\n##############################\n')
+    # print(gyrX)
     # print('\nAverage frequency: ', avg_freq, 'Hz\n')
     # df = pd.DataFrame(dic)
     # print(df) 
     # print(type(k))
     # print(dat)
     print('****END*****')
+    
+    # Returning all data
+    return xa,ya,za,xg,yg,zg,timeVecs,sampFreqVec
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#    main()
