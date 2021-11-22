@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 from io import BytesIO
-import owncloud
+# import owncloud
+import glob
 from datetime import datetime
 import numpy as np
 from scipy import signal
@@ -31,11 +32,15 @@ import re
 #********************************************************************************************
 
 
-def csvread(): # All the data parsing happens in a main function
-    # Obtaining the datasets from the remote storage (Sceibo)
-    public_link = 'https://rwth-aachen.sciebo.de/s/ZpRI67lfqD27VlK?path=%2F'
-    folder_password = 'CIE_2021'
-    oc = owncloud.Client.from_public_link(public_link, folder_password=folder_password)
+def csvread(): # All the data parsing happens in this function
+    # %% Obtaining the datasets from the remote storage (Sceibo)
+    # Initially it was working well but ever since all the data was zipped
+    # the code doesn't work
+    # New Solution -> Download all the data and access data locally instead of remotely
+    # public_link = 'https://rwth-aachen.sciebo.de/s/ZpRI67lfqD27VlK?path=%2F'
+    # folder_password = 'CIE_2021'
+    # oc = owncloud.Client.from_public_link(public_link, folder_password=folder_password)
+    # oc = owncloud.Client.from_public_link(public_link);
     # save_location = '/home/raj/Documents/modules/computational-intelligence-in-engineering/git/projectaim2t7/'
     # date_time = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
     # fullsave_location = os.path.join (save_location, date_time)
@@ -43,6 +48,9 @@ def csvread(): # All the data parsing happens in a main function
     #sub = np.arange(215)
     #sub = list(sub.astype(str))
     # print(sub)
+    
+    #%% Accessing all folders locally
+    # The data folders need to be in the same folder as the parsing script
     subject_id = ['215','216','217'] # list containing the subject numbers as strings
     # subject_id is used to detect the subject #s in the subfolders
     
@@ -61,7 +69,7 @@ def csvread(): # All the data parsing happens in a main function
     zg = [] # Empty list for storing all X gyroscope values
     
     
-    files = oc.list('/Smartphone3/', depth = 'infinity') # files is a list 
+    # files = oc.list('/Smartphone3/', depth = 'infinity') # files is a list 
     # Each element of the list files is basically an object which contains info
     # on the files contained in the remote directory we are in
     # At this point in the code, we are inside the Smartphone 3 folder 
@@ -88,7 +96,7 @@ def csvread(): # All the data parsing happens in a main function
                     if parent != 'meta': # Ensuring no folder with the name 'meta' are read
                         # Our aim is to just differentiate between 3 gait types: Normal/Even,Upstairs,Downstairs
                         # All folders having information on Impaired walking are omitted
-                        if not re.search(r'red', gait[1]): # All folders having the words 'red' in their names
+                        if not re.search(r'red', gait[1]): # All folders having the words 'red' in their names are omitted
                             content=oc.get_file_contents(file.get_path() + '/' + file.get_name()) 
                             csv = pd.read_csv(BytesIO(content)) # csv is a dataframe defined under the Pandas module
                             
@@ -123,7 +131,7 @@ def csvread(): # All the data parsing happens in a main function
                             time = np.empty((len(csv),1)) 
                             
                             
-                            # Crude Fix: Check the filename first and then iterate through the csv ross:
+                            # Crude Fix: Check the filename first and then iterate through the csv rows:
                                 # we will have 2 for loops in this case instead of one
                                 
                             # Desired Structure of the lists
