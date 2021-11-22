@@ -2,6 +2,7 @@
 # Importing Modules
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.fft import fft, fftfreq, rfft, rfftfreq # For FFT
 
 from dataParser import dataParser # importing the function for reading all the csv files
 # Importing data filtering function
@@ -22,13 +23,75 @@ gyr = list(GyrData.values())
 
 
 # Raw Data
-ax = acc[0][:,1]
-ay = acc[0][:,2]
-t = acc[0][:,0]
+ax = acc[10][:,1]
+ay = acc[10][:,2]
+az = acc[10][:,3]
+ta = acc[10][:,0]
+
+gx = gyr[10][:,1]
+gy = gyr[10][:,2]
+gz = gyr[10][:,3]
+tg = gyr[10][:,0]
 print('Raw Data Extracted')
+
 # Filtered Data
-axFilt = dataFilter(ax,4,5,sampfreqAcc[0])
-ayFilt = dataFilter(ay,4,5,sampfreqAcc[0])
+# Deciding cut-off frequency for filtering
+# Using FFT (Fast Fourier Transform)
+# The frequency for which the frequency strength stops having significant peaks, that can 
+# be assumed to be the cut-off frequency
+
+yfx = rfft(ax) # rfft(Raw Signal)
+xfx = rfftfreq(np.size(ax),1/sampfreqAcc[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+fig = plt.figure(figsize = (10,10))
+plt.plot(xfx,abs(yfx))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Frequency Strength')
+plt.grid()
+
+yfy = rfft(ay) # rfft(Raw Signal)
+xfy = rfftfreq(np.size(ay),1/sampfreqAcc[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+fig = plt.figure(figsize = (10,10))
+plt.plot(xfy,abs(yfy))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Frequency Strength')
+plt.grid()
+
+yfz = rfft(az) # rfft(Raw Signal)
+xfz = rfftfreq(np.size(az),1/sampfreqAcc[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+fig = plt.figure(figsize = (10,10))
+plt.plot(xfz,abs(yfz))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Frequency Strength')
+plt.grid()
+
+yfxg = rfft(gx) # rfft(Raw Signal)
+xfxg = rfftfreq(np.size(gx),1/sampfreqGyr[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+fig = plt.figure(figsize = (10,10))
+plt.plot(xfxg,abs(yfxg))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Frequency Strength')
+plt.grid()
+
+yfyg = rfft(gy) # rfft(Raw Signal)
+xfyg = rfftfreq(np.size(gy),1/sampfreqGyr[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+fig = plt.figure(figsize = (10,10))
+plt.plot(xfyg,abs(yfyg))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Frequency Strength')
+plt.grid()
+
+yfzg = rfft(gz) # rfft(Raw Signal)
+xfzg = rfftfreq(np.size(gz),1/sampfreqGyr[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+fig = plt.figure(figsize = (10,10))
+plt.plot(xfzg,abs(yfzg))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Frequency Strength')
+plt.grid()
+
+
+
+axFilt = dataFilter(ax,4,10,sampfreqAcc[0])
+ayFilt = dataFilter(ay,4,10,sampfreqAcc[0])
 print('Data Filtered')
 
 # Plotting Raw and Filtered Acceleration X
@@ -39,6 +102,9 @@ axis1.set_xlabel('Time (s)')
 axis1.set_ylabel('Acceleration in X (m/s2)')
 axis2.set_xlabel('Time (s)')
 axis2.set_ylabel('Filtered Acceleration in X (m/s2)')
+axis1.axis([0,30,-15,15])
+axis2.axis([0,30,-15,15])
+plt.grid()
 print('Raw and Filtered Acceleration X Plotted')
 
 
@@ -50,6 +116,8 @@ axis1.set_xlabel('Time (s)')
 axis1.set_ylabel('Acceleration in Y (m/s2)')
 axis2.set_xlabel('Time (s)')
 axis2.set_ylabel('Filtered Acceleration in Y (m/s2)')
-print('Raw and Filtered Acceleration Y Plotted')
+axis1.axis([0,30,-30,10])
+axis2.axis([0,30,-30,10])
+print('Raw and Filtered Acceleration Y Plotted')    
 
 
