@@ -14,7 +14,6 @@ import pandas as pd
 
 
 
-
 #%% ***************** Structure of the dataset:**************************
     # Home Folder -> Smartphone1
     #             -> Smartphone2
