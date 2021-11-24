@@ -10,10 +10,10 @@ from dataFilter import dataFilter
 
 
 #%% Obtaining all pertinent data for the mentioned subject numbers
-AccData,GyrData = dataParser()
+AccData,GyrData,experiments = dataParser()
 
 # All sampling Frequencies
-sampfreqAcc = list(AccData.keys()) # All acceelration files sampling frequencies
+sampfreqAcc = list(AccData.keys()) # All acceleration files sampling frequencies
 sampfreqGyr = list(GyrData.keys()) # All gyroscope files sampling frequencies
 
 # All csv data
@@ -23,15 +23,15 @@ gyr = list(GyrData.values())
 
 
 # Raw Data
-ax = acc[10][:,1]
-ay = acc[10][:,2]
-az = acc[10][:,3]
-ta = acc[10][:,0]
+ax = acc[1][:,1]
+ay = acc[1][:,2]
+az = acc[1][:,3]
+ta = acc[1][:,0]
 
-gx = gyr[10][:,1]
-gy = gyr[10][:,2]
-gz = gyr[10][:,3]
-tg = gyr[10][:,0]
+gx = gyr[1][:,1]
+gy = gyr[1][:,2]
+gz = gyr[1][:,3]
+tg = gyr[1][:,0]
 print('Raw Data Extracted')
 
 # Filtered Data
@@ -41,52 +41,57 @@ print('Raw Data Extracted')
 # be assumed to be the cut-off frequency
 
 yfx = rfft(ax) # rfft(Raw Signal)
-xfx = rfftfreq(np.size(ax),1/sampfreqAcc[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+xfx = rfftfreq(np.size(ax),1/sampfreqAcc[1]) # rfftfreq(#Datapoints, 1/sampling frequency)
 fig = plt.figure(figsize = (10,10))
 plt.plot(xfx,abs(yfx))
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Frequency Strength')
 plt.grid()
+# plt.axis([0,50,0,14000])
 
 yfy = rfft(ay) # rfft(Raw Signal)
-xfy = rfftfreq(np.size(ay),1/sampfreqAcc[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+xfy = rfftfreq(np.size(ay),1/sampfreqAcc[1]) # rfftfreq(#Datapoints, 1/sampling frequency)
 fig = plt.figure(figsize = (10,10))
 plt.plot(xfy,abs(yfy))
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Frequency Strength')
 plt.grid()
+# plt.axis([0,50,0,14000])
 
 yfz = rfft(az) # rfft(Raw Signal)
-xfz = rfftfreq(np.size(az),1/sampfreqAcc[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+xfz = rfftfreq(np.size(az),1/sampfreqAcc[1]) # rfftfreq(#Datapoints, 1/sampling frequency)
 fig = plt.figure(figsize = (10,10))
 plt.plot(xfz,abs(yfz))
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Frequency Strength')
 plt.grid()
+# plt.axis([0,50,0,14000])
 
-yfxg = rfft(gx) # rfft(Raw Signal)
-xfxg = rfftfreq(np.size(gx),1/sampfreqGyr[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
-fig = plt.figure(figsize = (10,10))
-plt.plot(xfxg,abs(yfxg))
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Frequency Strength')
-plt.grid()
-
-yfyg = rfft(gy) # rfft(Raw Signal)
-xfyg = rfftfreq(np.size(gy),1/sampfreqGyr[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
-fig = plt.figure(figsize = (10,10))
-plt.plot(xfyg,abs(yfyg))
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Frequency Strength')
-plt.grid()
-
-yfzg = rfft(gz) # rfft(Raw Signal)
-xfzg = rfftfreq(np.size(gz),1/sampfreqGyr[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
-fig = plt.figure(figsize = (10,10))
-plt.plot(xfzg,abs(yfzg))
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Frequency Strength')
-plt.grid()
+# =============================================================================
+# yfxg = rfft(gx) # rfft(Raw Signal)
+# xfxg = rfftfreq(np.size(gx),1/sampfreqGyr[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+# fig = plt.figure(figsize = (10,10))
+# plt.plot(xfxg,abs(yfxg))
+# plt.xlabel('Frequency (Hz)')
+# plt.ylabel('Frequency Strength')
+# plt.grid()
+# 
+# yfyg = rfft(gy) # rfft(Raw Signal)
+# xfyg = rfftfreq(np.size(gy),1/sampfreqGyr[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+# fig = plt.figure(figsize = (10,10))
+# plt.plot(xfyg,abs(yfyg))
+# plt.xlabel('Frequency (Hz)')
+# plt.ylabel('Frequency Strength')
+# plt.grid()
+# 
+# yfzg = rfft(gz) # rfft(Raw Signal)
+# xfzg = rfftfreq(np.size(gz),1/sampfreqGyr[10]) # rfftfreq(#Datapoints, 1/sampling frequency)
+# fig = plt.figure(figsize = (10,10))
+# plt.plot(xfzg,abs(yfzg))
+# plt.xlabel('Frequency (Hz)')
+# plt.ylabel('Frequency Strength')
+# plt.grid()
+# =============================================================================
 
 
 

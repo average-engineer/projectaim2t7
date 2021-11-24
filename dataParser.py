@@ -42,11 +42,14 @@ def dataParser():
     
     # Initialising empty dictionary for storing all acceleration and gyroscope data
     
-    # The keys in the dictionary will be the sampling frequencies corresponding to each csv file
+    # The keys in the dictionary will be the sampling frequencies and experiment names corresponding to each csv file
     # The values in the dictionary will be the 2D arrays containing the entire csv data
     
     AccData = {} # Dictionary for Acceleration data
     GyrData = {} # Dictionary for gyroscope data
+    
+    # Empty List for storing experiment names
+    exp = []
     
     
     for folder in folders:
@@ -72,6 +75,8 @@ def dataParser():
         Split1 = Split1[-1]
         Split2 = re.split('_',Split1)
         experiment = Split2[-1]
+        experiment = re.split('0',experiment)
+        experiment = experiment[0]
         Split2 = Split2[0]
         Split3 = re.split('t',Split2)
         subjectNum = Split3[-1]
@@ -113,12 +118,18 @@ def dataParser():
                 
             sampFreqAcc = np.shape(acc)[0]/acc[-1,0]
             sampFreqGyr = np.shape(gyr)[0]/gyr[-1,0]
+            # Dictionary keys have to be immutable only (like tuples)
+            keyAcc = sampFreqAcc
+            keyGyr = sampFreqGyr
             
             # Adding elements to the acceleration and gyroscope dictionaries
-            AccData[sampFreqAcc] = acc # The accelerometer file sampling frequency is the key and the csv data is the value
-            GyrData[sampFreqGyr] = gyr # The accelerometer file sampling frequency is the key and the csv data is the value
+            AccData[keyAcc] = acc # The accelerometer file sampling frequency is the key and the csv data is the value
+            GyrData[keyGyr] = gyr # The gyroscope file sampling frequency is the key and the csv data is the value
+            
+            # Appending experiment names to the experiment list
+            exp.append(experiment)
             
     # print(AccData)
         
     print('Ending Data Parsing')
-    return AccData, GyrData 
+    return AccData, GyrData, exp
