@@ -33,7 +33,11 @@ def dataParser():
     print('Starting Data Parsing')
     
     # Required Subject IDs -> Which Subject Data are taken
-    subjID = ['215','216','217'];
+    startSub = 150
+    endSub = 219
+    numSub = endSub - startSub + 1
+    subjID = list(np.linspace(startSub,endSub,numSub))
+    # subjID = ['155','224','257']
     
     # Accesing all folders inside the Smartphone 3 folder
     folders = glob.glob(r'./ProjectAData/Data/Smartphone3/*')  # folders is a list containing all folder names as strings
@@ -82,7 +86,7 @@ def dataParser():
         
         
         # Accesing the accelerometer and gyroscope files for the matching subject ids
-        if subjectNum in subjID:
+        if float(subjectNum) in subjID:
             gyr_file = glob.glob(folder+'/Gyroscope.csv')
             acc_file = glob.glob(folder+'/Accelerometer.csv')
             
@@ -106,7 +110,7 @@ def dataParser():
             # print(gyr)
             
             data_acc = pd.read_csv(acc_file[0],sep = ",", header = None)
-            acc = data_acc.iloc[1:,0:4].values.astype(float)
+            acc = data_acc.iloc[1:,0:4].values.astype(float) # Columns 0,1,2,3 are read (Index 4 is left out, similar to range)
             # print(data_acc)
             # print(acc)
             
