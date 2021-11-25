@@ -87,23 +87,43 @@ for path in paths:
         trans_df_acc = pd.DataFrame(trans_acc)
     
     #Segmenting
-        peaks, diffpeaks = seg_data_acc(trans_df_acc.iloc[1:,0].values.astype(float))
+        peaks_acc, diffpeaks_acc = seg_data_acc(trans_df_acc.iloc[1:,0].values.astype(float))
         cycle_list_acc = []
+        cycle_list_gyr = []
         j=0
-        for i in peaks:
+        for i in peaks_acc:
             cycle_list_acc.append(trans_df_acc.iloc[j:i+1,0].values.astype(float))
             j=i+1
+
+        peaks, diffpeaks = seg_data_acc(trans_df_gyr.iloc[1:,0].values.astype(float))
+        m=0
+        for n in peaks:
+            cycle_list_gyr.append(trans_df_gyr.iloc[m:n+1,0].values.astype(float))
+            m=n+1
         # print(cycle_list_acc)
+        # print(cycle_list_gyr)
+
 
     #Resampling
-        df1 = pd.DataFrame(cycle_list_acc)
-        df2 = pd.DataFrame()
-        for i in range(df1.shape[1]):
-            for j in range(df1.shape[0]):
+        df1_acc = pd.DataFrame(cycle_list_acc)
+        df2_acc = pd.DataFrame()
+        for i in range(df1_acc.shape[1]):
+            for j in range(df1_acc.shape[0]):
                 try :
-                    df2 = signal.resample(df1.iloc[0:j,0:i],50)
+                    df2_acc = signal.resample(df1_acc.iloc[0:j,0:i],50)
                 except :
                     pass
-        print(df2.shape)
-        plt.plot(df2)
+        # print(df2_acc.shape)
+        # plt.plot(df2_acc)
+        # plt.show()
+        df1_gyr = pd.DataFrame(cycle_list_gyr)
+        df2_gyr = pd.DataFrame()
+        for i in range(df1_gyr.shape[1]):
+            for j in range(df1_gyr.shape[0]):
+                try :
+                    df2_gyr = signal.resample(df1_gyr.iloc[0:j,0:i],50)
+                except :
+                    pass
+        print(df2_gyr.shape)
+        plt.plot(df2_gyr)
         plt.show()
