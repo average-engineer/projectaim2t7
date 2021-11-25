@@ -69,7 +69,7 @@ for path in paths:
     
     #Filtering
         filter_acc =filter_data(acc,fs=sampling_frequency_acc,fc=2)
-        filter_gyr = filter_data(gyr, fs=sampling_frequency_gyr, fc=4)
+        filter_gyr = filter_data(gyr, fs=sampling_frequency_gyr, fc=1)
     
     #Cutting
         acc_cut, gyr_cut = cut_data(filter_acc,filter_gyr,samp_freq_acc)
