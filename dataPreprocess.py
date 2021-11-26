@@ -12,6 +12,8 @@ from dataParser import dataParser # importing the function for reading all the c
 from dataFilter import dataFilter
 # Importing data cutting function
 from dataCut import dataCut
+# Importing data segmenting function
+from dataSegment import dataSegment
 
 
 #%% Obtaining all pertinent data for the mentioned subject numbers
@@ -213,13 +215,49 @@ axis3.axis([0,30,-5,5])
 axis3.grid()
 print('Filtered Angular Velocity Plotted')  
 
+#%% Further Preprocessing
+# Empty List for New Processed acceleration data
+acc1 = []
+# Empty List for New Processed gyroscope data
+gyr1 = []
+
+for i in range(0,len(acc)):
+    #%% Cutting Data
+    acc_cut,gyr_cut = dataCut(acc[i][:,1:4],gyr[i][:,1:4],sampfreqAcc[i],sampfreqGyr[i])
+    
+    if np.shape(gyr_cut)[0] == 0: # Some issues in some trials where gyroscope data vanishes
+                                  # after cutting the data -> Trials where that is happening 
+                                  # are omitted for now
+        continue
+    
+    #%% Rotating and Reducing Dimensionality of Data -> Principle Component Analysis
+    data_gyr = scale(gyr_cut)
+    pca_gyr = decomposition.PCA(n_components=1) # Number of prinicple component axes = 1
+    pca_gyr.fit(data_gyr)
+    trans_gyr = pca_gyr.transform(data_gyr)
+    # trans_df_gyr = pd.DataFrame(trans_gyr)
+    data_acc = scale(acc_cut)
+    pca_acc = decomposition.PCA(n_components=1)
+    pca_acc.fit(data_acc)
+    trans_acc = pca_acc.transform(data_acc)
+    # trans_df_acc = pd.DataFrame(trans_acc)
+    
+# =============================================================================
+#     acc_rms = np.empty((np.shape(acc_cut)[0]))
+#     for i in range(0,np.shape(acc_cut)[0]):
+#         acc_rms[i] = np.sqrt((np.power(acc_cut[i,0],2) + np.power(acc_cut[i,1],2) + np.power(acc_cut[i,2],2))/(3))
+# =============================================================================
+    
+    #%% Segmenting the data
+    segAcc, segGyr = dataSegment(trans_acc[:,0],trans_gyr[:,0])
 
 
+    acc1.append(segAcc)
+    gyr1.append(segGyr)
+    
 
-#%% Cutting Data
-acc_cut,gyr_cut = dataCut(acc[13][:,1:4],gyr[13][:,1:4],sampfreqAcc[13],sampfreqGyr[13])
 
-# acc_cut and gyr_cut are 2D arrays containing the X,Y and Z (excluding the time vector) values of the cut data
+#%% acc_cut and gyr_cut are 2D arrays containing the X,Y and Z (excluding the time vector) values of the cut data
 
 # =============================================================================
 # fig,(axis1,axis2,axis3) = plt.subplots(nrows = 3, ncols = 1, figsize = (7,7))
@@ -233,25 +271,13 @@ acc_cut,gyr_cut = dataCut(acc[13][:,1:4],gyr[13][:,1:4],sampfreqAcc[13],sampfreq
 # axis3.grid()
 # =============================================================================
 
-#%% Rotating and Reducing Dimensionality of Data -> Principle Component Analysis
-data_gyr = scale(gyr_cut)
-pca_gyr = decomposition.PCA(n_components=1) # Number of prinicple component axes = 1
-pca_gyr.fit(data_gyr)
-trans_gyr = pca_gyr.transform(data_gyr)
-trans_df_gyr = pd.DataFrame(trans_gyr)
-data_acc = scale(acc_cut)
-pca_acc = decomposition.PCA(n_components=1)
-pca_acc.fit(data_acc)
-trans_acc = pca_acc.transform(data_acc)
-trans_df_acc = pd.DataFrame(trans_acc)
 
-
-acc_rms = np.empty((np.shape(acc_cut)[0]))
-for i in range(0,np.shape(acc_cut)[0]):
-    acc_rms[i] = np.sqrt((np.power(acc_cut[i,0],2) + np.power(acc_cut[i,1],2) + np.power(acc_cut[i,2],2))/(3))
+#%%
     
-fig = plt.figure(figsize = (10,10))
-plt.plot(trans_acc,label = 'PCATime Series')
-# plt.plot(acc_rms, label = 'RMS Time Series')
-plt.legend()
-# plt.show()
+# =============================================================================
+# fig = plt.figure(figsize = (10,10))
+# plt.plot(trans_acc,label = 'PCATime Series')
+# # plt.plot(acc_rms, label = 'RMS Time Series')
+# plt.legend()
+# # plt.show()
+# =============================================================================

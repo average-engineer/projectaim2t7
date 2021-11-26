@@ -36,7 +36,7 @@ def cut_data(acc_filt, gyr_filt, freq):
     return acc_cut, gyr_cut
 
 def seg_data_acc(trans_df_acc):
-    peaks, _ = signal.find_peaks(trans_df_acc)
+    peaks, _ = signal.find_peaks(trans_df_acc) # Returns indices of peaks 
     diff_peaks =np.diff(peaks)
 
     return peaks,diff_peaks

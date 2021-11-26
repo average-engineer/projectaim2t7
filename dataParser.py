@@ -34,7 +34,7 @@ def dataParser():
     
     # Required Subject IDs -> Which Subject Data are taken
     startSub = 150
-    endSub = 219
+    endSub = 216
     numSub = endSub - startSub + 1
     subjID = list(np.linspace(startSub,endSub,numSub))
     # subjID = ['155','224','257']
