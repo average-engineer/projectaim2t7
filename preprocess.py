@@ -19,13 +19,13 @@ def filter_data(sensordata, fs=200, fc=5):
     
     return sensordata_filt
     
-def cut_data(acc_filt, gyr_filt, freq):
+def cut_data(acc_filt, gyr_filt):
     acc_abs = np.linalg.norm(acc_filt,axis=1)
     
 
-    peaks, _ = signal.find_peaks(acc_abs,height=11, distance=freq/2)
+    peaks, _ = signal.find_peaks(acc_abs,height=11)
     diff_peaks =np.diff(peaks)
-    gap1  = np.argmax(diff_peaks[:20])
+    gap1  = np.argmax(diff_peaks[:10])
     gap2  = np.argmax(diff_peaks[-10:])
     gap2  = int(gap2 + np.shape(diff_peaks)-10)
 
@@ -72,13 +72,13 @@ for path in paths:
             sampling_frequency_gyr = np.round(len(time_gyr)/(time_gyr[-1]))
             samp_freq_acc = np.round(len(time_acc)/(time_acc[-1]))
             sampling_frequency_acc = np.round(len(time_acc)/(time_acc[-1]))
+            #  print(experiment_name)
             if sampling_frequency_acc > 10:        
-            # Filtering
+        # Filtering
                 filter_acc =filter_data(acc,fs=sampling_frequency_acc,fc=2)
                 filter_gyr = filter_data(gyr, fs=sampling_frequency_gyr, fc=1)
-            
             # Cutting
-                acc_cut, gyr_cut = cut_data(filter_acc,filter_gyr,samp_freq_acc)
+                acc_cut, gyr_cut = cut_data(filter_acc,filter_gyr)
                 
             # PCA
                 # data_gyr = scale(gyr_cut)
@@ -90,23 +90,24 @@ for path in paths:
                 pca_acc = decomposition.PCA(n_components=1)
                 pca_acc.fit(data_acc)
                 trans_acc = pca_acc.transform(data_acc)
-                # print(len(trans_acc))
                 sample_list_acc.append(trans_acc)
                 ga = re.split('0',gait)
                 gait_list.append(ga)
-                # print(len(sample_list_acc))
+
         except:
             pass
+
 try:
         
     for k in range(len(file_list)):
         training_data_acc['trial'] = training_data_acc['trial'].astype('object')
-        training_data_acc.at[k,'trial'] = sample_list_acc[k]
+        training_data_acc.at[k,'trial'] = sample_list_acc[k].transpose()
         training_data_acc.at[k,'sensor'] = 'Accelerometer'
         training_data_acc.at[k, 'gait'] = gait_list[k][0]
-        print(training_data_acc)
+ 
 except:
     pass
+print(training_data_acc)
         # Segmenting
             # peaks_acc, diffpeaks_acc = seg_data_acc(trans_df_acc.iloc[1:,0].values.astype(float))
         # cycle_list_acc = []
@@ -123,7 +124,6 @@ except:
             # m=n+1
         # print(cycle_list_acc)
         # print(cycle_list_gyr)
-# 
 # 
     # Resampling
         # df1_acc = pd.DataFrame(cycle_list_acc)
