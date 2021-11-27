@@ -4,6 +4,7 @@ from scipy import signal
 import glob
 import re
 import pandas as pd
+from scipy.signal.ltisys import TransferFunctionDiscrete
 from sklearn.preprocessing import scale
 from sklearn import decomposition
 
@@ -56,7 +57,7 @@ for path in paths:
     splitexp = re.split('_',experiment_name)
     subj=splitexp[0]
     gait=splitexp[1]
-    if not re.search(r'red', gait):
+    if not re.search(r'red', gait) and re.search(r'215',subj):
         # re.search(r'215',subj) or re.search(r'217',subj)
         try:
             file_list.append(experiment_name)
@@ -107,7 +108,14 @@ try:
  
 except:
     pass
-print(training_data_acc)
+
+training_data_acc['trials'] = [','.join(map(str, l)) for l in training_data_acc['trial']]
+training_data_acc.drop(training_data_acc.columns[0], axis=1, inplace=True)
+# training_data_acc['trials'].to_string(header = True, index = True).split('\n')
+# print(training_data_acc)
+training_data_acc.to_csv('timser_data.csv')
+
+
         # Segmenting
             # peaks_acc, diffpeaks_acc = seg_data_acc(trans_df_acc.iloc[1:,0].values.astype(float))
         # cycle_list_acc = []

@@ -1,0 +1,18 @@
+training:
+    batch_size: 64
+    epochs: 1000
+    learning_rate: 0.001
+
+input_features:
+    -
+        name: trials
+        type: set
+        
+    -
+        name: sensor
+        type: category
+
+output_features:
+    -
+        name: gait
+        type: category
