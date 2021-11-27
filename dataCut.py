@@ -20,6 +20,11 @@ from scipy import signal
     # the series being the norm across the rows (X,Y and Z)
         
 #%% Function Definition
+
+# Empty placeholder lists
+accEmp = []
+gyrEmp = []
+
 def dataCut(acc, gyr, accfreq, gyrfreq): # 2D arrays containing data in all 3D coordinates are input to te function
     # Taking norms across columns in each row and converting into one time series
     acc_abs = np.linalg.norm(acc,axis = 1)
@@ -31,14 +36,19 @@ def dataCut(acc, gyr, accfreq, gyrfreq): # 2D arrays containing data in all 3D c
     diff_peaks = np.diff(peaks) # diff_peaks gives us the diffference between the index numbers of consecutive peaks
     gap1  = np.argmax(diff_peaks[:20]) # Largest difference index number betwween consecutive peak indices in the first 20 peaks
     gap2  = np.argmax(diff_peaks[-10:]) # Largest difference index number betwween consecutive peak indices in the last 10 peaks
-    gap2  = int(gap2 + np.shape(diff_peaks)-10) # gap2 index number is defined wrt start of the indices 
+    gap2  = int(gap2 + np.shape(diff_peaks)[0]-10) # gap2 index number is defined wrt start of the indices 
+
+    if (gap2 + np.shape(diff_peaks)[0]) < 11:
+        return accEmp,gyrEmp
+    
+    else:
+        # Extracted Motion Sequence
+        acc_cut = acc[peaks[gap1+1]:peaks[gap2],:]
+        gyr_cut = gyr[peaks[gap1+1]:peaks[gap2],:]
+    
+        print('Motion Sequence Extracted')
+    
+        return acc_cut, gyr_cut # Cut 2D arrays returned
 
     
-    # Extracted Motion Sequence
-    acc_cut = acc[peaks[gap1+1]:peaks[gap2],:]
-    gyr_cut = gyr[peaks[gap1+1]:peaks[gap2],:]
-    
-    print('Motion Sequence Extracted')
-    
-    return acc_cut, gyr_cut # Cut 2D arrays returned
     

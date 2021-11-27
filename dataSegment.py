@@ -5,10 +5,11 @@ import numpy as np
 
 #%% Function Definition
 def dataSegment(acc,gyr):
-    peaksAcc, _ = signal.find_peaks(acc) # Returns indices of peaks in acceleration data
-    peaksGyr, _ = signal.find_peaks(gyr) # Returns indices of peaks in gyroscope data
+    # Peak Finding
+    peaksAcc, _ = signal.find_peaks(acc,height = 2) # Returns indices of peaks in acceleration data
+    peaksGyr, _ = signal.find_peaks(gyr,height = 1.4) # Returns indices of peaks in gyroscope data
     
-# =============================================================================
+# ===============================s==============================================
 #     diff_peaksAcc = np.diff(peaksAcc)
 #     diff_peaksGyr = np.diff(peaksGyr)
 # =============================================================================
@@ -28,7 +29,7 @@ def dataSegment(acc,gyr):
     jj = 0
     for ii in peaksAcc:
         cycAcc = acc[jj:ii + 1] # Cycle obtained as array
-        cycAcc = signal.resample(cycAcc,50)
+        cycAcc = signal.resample(cycAcc,100)
         segAcc.append(cycAcc)
         jj = ii + 1
         #print(segAcc,type(segAcc))
@@ -38,7 +39,7 @@ def dataSegment(acc,gyr):
     jj = 0
     for ii in peaksGyr:
         cycGyr = gyr[jj:ii + 1] # Cycle obtained 
-        cycGyr = signal.resample(cycGyr,50)
+        cycGyr = signal.resample(cycGyr,100)
         segGyr.append(cycGyr)
         jj = ii + 1
 

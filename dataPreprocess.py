@@ -15,6 +15,13 @@ from dataCut import dataCut
 # Importing data segmenting function
 from dataSegment import dataSegment
 
+#%% Global Variables
+global coFreqAcc # Cut-off frequency for acceleration data
+global coFreqGyr # Cut-off frequency for gyroscope data
+coFreqAcc = 5 # Hz
+coFreqGyr = 1 # Hz
+
+#%% Dataframes for accumulating data
 colNames = ['Trials','Sensor','Gait']
 accData = pd.DataFrame(columns = colNames)
 gyrData = pd.DataFrame(columns = colNames)
@@ -163,14 +170,14 @@ print('Raw Angular Velocity Plotted')
 
 #%% Filtering the Data
 for i in range(0,len(acc)):
-    acc[i][:,1] = dataFilter(acc[i][:,1],4,3,sampfreqAcc[i])
-    acc[i][:,2] = dataFilter(acc[i][:,2],4,3,sampfreqAcc[i])
-    acc[i][:,3] = dataFilter(acc[i][:,3],4,3,sampfreqAcc[i])
+    acc[i][:,1] = dataFilter(acc[i][:,1],4,coFreqAcc,sampfreqAcc[i])
+    acc[i][:,2] = dataFilter(acc[i][:,2],4,coFreqAcc,sampfreqAcc[i])
+    acc[i][:,3] = dataFilter(acc[i][:,3],4,coFreqAcc,sampfreqAcc[i])
     
 for j in range(0,len(gyr)):
-    gyr[j][:,1] = dataFilter(gyr[j][:,1],4,2,sampfreqGyr[j])
-    gyr[j][:,2] = dataFilter(gyr[j][:,2],4,2,sampfreqGyr[j])
-    gyr[j][:,3] = dataFilter(gyr[j][:,3],4,2,sampfreqGyr[j])
+    gyr[j][:,1] = dataFilter(gyr[j][:,1],4,coFreqGyr,sampfreqGyr[j])
+    gyr[j][:,2] = dataFilter(gyr[j][:,2],4,coFreqGyr,sampfreqGyr[j])
+    gyr[j][:,3] = dataFilter(gyr[j][:,3],4,coFreqGyr,sampfreqGyr[j])
     
     
 print('Data Filtered')
@@ -236,7 +243,10 @@ for i in range(0,len(acc)):
     #%% Cutting Data
     acc_cut,gyr_cut = dataCut(acc[i][:,1:4],gyr[i][:,1:4],sampfreqAcc[i],sampfreqGyr[i])
     
-    if np.shape(gyr_cut)[0] == 0: # Some issues in some trials where gyroscope data vanishes
+    if len(acc_cut) == 0 or len(gyr_cut) == 0:
+        continue
+    
+    if np.shape(gyr_cut)[0] == 0 or np.shape(acc_cut)[0] == 0: # Some issues in some trials where gyroscope data vanishes
                                   # after cutting the data -> Trials where that is happening 
                                   # are omitted for now
         continue
@@ -261,15 +271,20 @@ for i in range(0,len(acc)):
     
     #%% Segmenting the data and resampling the cycles
     segAcc, segGyr = dataSegment(trans_acc[:,0],trans_gyr[:,0])
+
     
-    if i == 2:
+    if i == 6:
         firstsegAcc = segAcc
         firstsegGyr = segGyr
+
     
     
     #%% Accumilating the Data
     accData['Trials'] = accData['Trials'].astype('object')
     gyrData['Trials'] = gyrData['Trials'].astype('object')
+    
+    
+    #%% Removing Malicious Data
     
     # Array for storing mean of each cycle
     meanCycle = np.zeros(len(segAcc))
@@ -326,9 +341,11 @@ for i in range(0,len(acc)):
     count = count+ 1
         
 # Sample Cycles
+
+# Acceleration
 fig, (axis1,axis2) = plt.subplots(nrows = 2, ncols = 1, figsize = (8,8))
-for i in range(len(accData.at[0,'Trials'])):
-    axis1.plot(accData.at[0,'Trials'][i])
+for i in range(len(accData.at[2,'Trials'])):
+    axis1.plot(accData.at[2,'Trials'][i])
 axis1.title.set_text('Malicious Data Excluded')
 axis1.grid()
 
@@ -336,8 +353,20 @@ for i in range(len(firstsegAcc)):
     axis2.plot(firstsegAcc[i])
 axis2.title.set_text('Malicious Data Included')
 axis2.grid()
+plt.show()
 
 
+# Gyroscope
+fig, (axis1,axis2) = plt.subplots(nrows = 2, ncols = 1, figsize = (8,8))
+for i in range(len(gyrData.at[2,'Trials'])):
+    axis1.plot(gyrData.at[2,'Trials'][i])
+axis1.title.set_text('Malicious Data Excluded')
+axis1.grid()
+
+for i in range(len(firstsegGyr)):
+    axis2.plot(firstsegGyr[i])
+axis2.title.set_text('Malicious Data Included')
+axis2.grid()
 plt.show()
 #%% acc_cut and gyr_cut are 2D arrays containing the X,Y and Z (excluding the time vector) values of the cut data
 

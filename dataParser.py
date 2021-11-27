@@ -3,7 +3,11 @@ import re
 import numpy as np
 import pandas as pd
 
-
+#%% Global Variables
+global coFreqAcc # Cut-off frequency for acceleration data
+global coFreqGyr # Cut-off frequency for gyroscope data
+coFreqAcc = 5 # Hz
+coFreqGyr = 1 # Hz
 #%% ******************* Desired Output of the Function *************************************
     # -> Sampling frequencies of all csv files being read
     # -> Time vectors of all csv files being read
@@ -34,7 +38,7 @@ def dataParser():
     
     # Required Subject IDs -> Which Subject Data are taken
     startSub = 150
-    endSub = 216
+    endSub = 274
     numSub = endSub - startSub + 1
     subjID = list(np.linspace(startSub,endSub,numSub))
     # subjID = ['155','224','257']
@@ -86,7 +90,10 @@ def dataParser():
         
         
         # Accesing the accelerometer and gyroscope files for the matching subject ids
-        if float(subjectNum) in subjID:
+        if float(subjectNum) in subjID and float(subjectNum) != 218 and float(subjectNum) != 222 and float(subjectNum) != 270: 
+            # Subject 218 folder files are not in the right format
+            # Subject 222 upstairs trial 01 folder doesn't have accelerometer file so the entire subject skipped
+            # Subject 270 downstairs trial 02 folder doesn't have gyroscope file so the entire subject skipped
             gyr_file = glob.glob(folder+'/Gyroscope.csv')
             acc_file = glob.glob(folder+'/Accelerometer.csv')
             
@@ -121,6 +128,13 @@ def dataParser():
                 
             sampFreqAcc = np.shape(acc)[0]/acc[-1,0]
             sampFreqGyr = np.shape(gyr)[0]/gyr[-1,0]
+            
+            # Due to some errors in data measurement, some sampling frequencies have blatantly wrong values (for eg. 0.3 Hz)
+            # Since for using digital filters, we require the digital filter critical frequency to be between 0 and 1
+            if sampFreqAcc < 2*coFreqAcc or sampFreqGyr < 2*coFreqGyr:
+                continue # The entire subject is skipped
+            
+            
             # Dictionary keys have to be immutable only (like tuples)
             keyAcc = sampFreqAcc
             keyGyr = sampFreqGyr
@@ -131,6 +145,9 @@ def dataParser():
             
             # Appending experiment names to the experiment list
             exp.append(experiment)
+            
+            # Printing the subject numbers and corresponding experiments whose files are accessed for reference
+            print(subjectNum,experiment,acc.shape[0],gyr.shape[0])
             
     # print(AccData)
         
