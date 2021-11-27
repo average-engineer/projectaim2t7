@@ -15,6 +15,14 @@ from dataCut import dataCut
 # Importing data segmenting function
 from dataSegment import dataSegment
 
+colNames = ['Trials','Sensor','Gait']
+accData = pd.DataFrame(columns = colNames)
+gyrData = pd.DataFrame(columns = colNames)
+# =============================================================================
+# accData = pd.DataFrame(columns = colNames)
+# gyrData = pd.DataFrame(columns = colNames)
+# =============================================================================
+
 
 #%% Obtaining all pertinent data for the mentioned subject numbers
 AccData,GyrData,experiments = dataParser()
@@ -155,9 +163,9 @@ print('Raw Angular Velocity Plotted')
 
 #%% Filtering the Data
 for i in range(0,len(acc)):
-    acc[i][:,1] = dataFilter(acc[i][:,1],4,5,sampfreqAcc[i])
-    acc[i][:,2] = dataFilter(acc[i][:,2],4,5,sampfreqAcc[i])
-    acc[i][:,3] = dataFilter(acc[i][:,3],4,5,sampfreqAcc[i])
+    acc[i][:,1] = dataFilter(acc[i][:,1],4,3,sampfreqAcc[i])
+    acc[i][:,2] = dataFilter(acc[i][:,2],4,3,sampfreqAcc[i])
+    acc[i][:,3] = dataFilter(acc[i][:,3],4,3,sampfreqAcc[i])
     
 for j in range(0,len(gyr)):
     gyr[j][:,1] = dataFilter(gyr[j][:,1],4,2,sampfreqGyr[j])
@@ -221,6 +229,9 @@ acc1 = []
 # Empty List for New Processed gyroscope data
 gyr1 = []
 
+count = 0
+firstsegAcc = []
+firstsegGyr = []
 for i in range(0,len(acc)):
     #%% Cutting Data
     acc_cut,gyr_cut = dataCut(acc[i][:,1:4],gyr[i][:,1:4],sampfreqAcc[i],sampfreqGyr[i])
@@ -248,15 +259,86 @@ for i in range(0,len(acc)):
 #         acc_rms[i] = np.sqrt((np.power(acc_cut[i,0],2) + np.power(acc_cut[i,1],2) + np.power(acc_cut[i,2],2))/(3))
 # =============================================================================
     
-    #%% Segmenting the data
+    #%% Segmenting the data and resampling the cycles
     segAcc, segGyr = dataSegment(trans_acc[:,0],trans_gyr[:,0])
-
-
-    acc1.append(segAcc)
-    gyr1.append(segGyr)
     
+    if i == 2:
+        firstsegAcc = segAcc
+        firstsegGyr = segGyr
+    
+    
+    #%% Accumilating the Data
+    accData['Trials'] = accData['Trials'].astype('object')
+    gyrData['Trials'] = gyrData['Trials'].astype('object')
+    
+    # Array for storing mean of each cycle
+    meanCycle = np.zeros(len(segAcc))
+    for ii in range(0,len(segAcc)):
+        meanCycle[ii] = np.mean(segAcc[ii])
+        
+    meanCycleMean = np.mean(meanCycle) # Mean of all cycle means
+    
+    # Standard Deviation of cycle means wrt mean of cycle means
+    sigma = np.std(meanCycle)
+    
+    segAcc_nonmal =[]
+    
+    for ii in range(0,meanCycle.shape[0]):
+        if meanCycle[ii] >= (meanCycleMean + sigma) or meanCycle[ii] <= (meanCycleMean - sigma):
+            continue # The particular cycle is removed
+        else:
+            segAcc_nonmal.append(segAcc[ii]) # List containing non-malicious cycles as arrays
+            
+    
+    # Array for storing mean of each cycle
+    meanCycle = np.zeros(len(segGyr))
+    for iter in range(len(segGyr)):
+        meanCycle[iter] = np.mean(segGyr[iter])
+        
+    meanCycleMean = np.mean(meanCycle) # Mean of all cycle means
+    
+    # Standard Deviation of cycle means wrt mean of cycle means
+    sigma = np.std(meanCycle)
+    
+    segGyr_nonmal = []
+    
+    for ii in range(len(segGyr)):
+        if meanCycle[ii] >= (meanCycleMean + sigma) or meanCycle[ii] <= (meanCycleMean - sigma)  :
+            continue # The particular cycle is removed
+        else:
+            segGyr_nonmal.append(segGyr[ii]) # List containing non-malicious cycles as arrays
+    
+    
+    accData.at[count,'Trials'] = segAcc_nonmal
+    
+    gyrData.at[count,'Trials'] = segGyr_nonmal
+    
+    accData.at[count,'Sensor'] = 'Accelerometer'
+    gyrData.at[count,'Sensor'] = 'Gyroscope'
+    
+    accData.at[count,'Gait'] = experiments[i]
+    gyrData.at[count,'Gait'] = experiments[i]
+
+    # Data stores alternatively as lists
+    acc1.append(segAcc_nonmal)
+    gyr1.append(segGyr_nonmal)
+    
+    count = count+ 1
+        
+# Sample Cycles
+fig, (axis1,axis2) = plt.subplots(nrows = 2, ncols = 1, figsize = (8,8))
+for i in range(len(accData.at[0,'Trials'])):
+    axis1.plot(accData.at[0,'Trials'][i])
+axis1.title.set_text('Malicious Data Excluded')
+axis1.grid()
+
+for i in range(len(firstsegAcc)):
+    axis2.plot(firstsegAcc[i])
+axis2.title.set_text('Malicious Data Included')
+axis2.grid()
 
 
+plt.show()
 #%% acc_cut and gyr_cut are 2D arrays containing the X,Y and Z (excluding the time vector) values of the cut data
 
 # =============================================================================

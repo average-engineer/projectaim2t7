@@ -48,7 +48,7 @@ sample_list_acc=[]
 df = pd.DataFrame()
 gait_list = []
 file_list =[]
-paths =glob.glob(r'./Data/Smartphone3/*')
+paths =glob.glob(r'./ProjectAData/Data/Smartphone3/*')
 
 for path in paths:
     name = re.split('/',path)
