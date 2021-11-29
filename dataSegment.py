@@ -4,10 +4,17 @@ from scipy import signal
 import numpy as np
 
 #%% Function Definition
-def dataSegment(acc,gyr):
-    # Peak Finding
-    peaksAcc, _ = signal.find_peaks(acc,height = 2) # Returns indices of peaks in acceleration data
-    peaksGyr, _ = signal.find_peaks(gyr,height = 1.4) # Returns indices of peaks in gyroscope data
+def dataSegment(acc,gyr,rot):
+    
+    if rot == 'PCA':
+        # Peak Finding when PCA is used
+        peaksAcc, _ = signal.find_peaks(acc,height = 2) # Returns indices of peaks in acceleration data
+        peaksGyr, _ = signal.find_peaks(gyr,height = 1.4) # Returns indices of peaks in gyroscope data
+        
+    elif rot == 'RMS':
+        # Peak Finding when RMS of normalised values are used
+        peaksAcc, _ = signal.find_peaks(acc,height = 1.2) # Returns indices of peaks in acceleration data
+        peaksGyr, _ = signal.find_peaks(gyr,height = 0.4) # Returns indices of peaks in gyroscope data
     
 # ===============================s==============================================
 #     diff_peaksAcc = np.diff(peaksAcc)

@@ -21,6 +21,12 @@ global coFreqGyr # Cut-off frequency for gyroscope data
 coFreqAcc = 5 # Hz
 coFreqGyr = 1 # Hz
 
+#%% Method for Rotating and Standardising Data
+# 1). PCA (principle component analysis) -> 'PCA'
+# 2). RMS of normalised time series -> 'RMS'
+
+rot = 'RMS'
+
 #%% Dataframes for accumulating data
 colNames = ['Trials','Sensor','Gait']
 accData = pd.DataFrame(columns = colNames)
@@ -252,25 +258,80 @@ for i in range(0,len(acc)):
         continue
     
     #%% Rotating and Reducing Dimensionality of Data -> Principle Component Analysis
-    data_gyr = scale(gyr_cut)
-    pca_gyr = decomposition.PCA(n_components=1) # Number of prinicple component axes = 1
-    pca_gyr.fit(data_gyr)
-    trans_gyr = pca_gyr.transform(data_gyr)
-    # trans_df_gyr = pd.DataFrame(trans_gyr)
-    data_acc = scale(acc_cut)
-    pca_acc = decomposition.PCA(n_components=1)
-    pca_acc.fit(data_acc)
-    trans_acc = pca_acc.transform(data_acc)
-    # trans_df_acc = pd.DataFrame(trans_acc)
     
-# =============================================================================
-#     acc_rms = np.empty((np.shape(acc_cut)[0]))
-#     for i in range(0,np.shape(acc_cut)[0]):
-#         acc_rms[i] = np.sqrt((np.power(acc_cut[i,0],2) + np.power(acc_cut[i,1],2) + np.power(acc_cut[i,2],2))/(3))
-# =============================================================================
+    if rot == 'PCA':
+        
+        data_gyr = scale(gyr_cut)
+        pca_gyr = decomposition.PCA(n_components=1) # Number of prinicple component axes = 1
+        pca_gyr.fit(data_gyr)
+        trans_gyr = pca_gyr.transform(data_gyr)
+        # trans_df_gyr = pd.DataFrame(trans_gyr)
+        data_acc = scale(acc_cut)
+        pca_acc = decomposition.PCA(n_components=1)
+        pca_acc.fit(data_acc)
+        trans_acc = pca_acc.transform(data_acc)
+        # trans_df_acc = pd.DataFrame(trans_acc)
+        
+        
+    # Rotating and Reducing Dimensionality of Data -> RMS Time series    
+        
+    elif rot == 'RMS':
+    
+        # Normalising the data
+        
+        # Acceleration
+        # Means of X,Y,Z time series
+        x_mean = np.mean(acc_cut[:,0])
+        y_mean = np.mean(acc_cut[:,1])
+        z_mean = np.mean(acc_cut[:,2])
+        
+        # Max of X,Y,Z time series
+        x_max = np.max(acc_cut[:,0])
+        y_max = np.max(acc_cut[:,1])
+        z_max = np.max(acc_cut[:,2])
+        
+        trans_acc = np.empty((np.shape(acc_cut)[0],1)) # empty array for storing the RMS time series of acceleration data
+        
+        # Normalised Data -> Between -1 and 1
+        # Values smaller than mean will be in [-1,0] and values greater than mean will be [0,1]
+        for ii in range(0,np.shape(acc_cut)[0]):
+    
+            x_norm = (acc_cut[ii,0] - x_mean)/(x_max - x_mean)
+            y_norm = (acc_cut[ii,0] - y_mean)/(y_max - y_mean)
+            z_norm = (acc_cut[ii,0] - z_mean)/(z_max - z_mean)
+            
+            trans_acc[ii] = np.sqrt((np.power(x_norm,2) + np.power(y_norm,2) + np.power(z_norm,2))/(3))
+            
+            
+        # Gyroscope
+        # Means of X,Y,Z time series
+        x_mean = np.mean(gyr_cut[:,0])
+        y_mean = np.mean(gyr_cut[:,1])
+        z_mean = np.mean(gyr_cut[:,2])
+        
+        # Max of X,Y,Z time series
+        x_max = np.max(gyr_cut[:,0])
+        y_max = np.max(gyr_cut[:,1])
+        z_max = np.max(gyr_cut[:,2])
+        
+        trans_gyr = np.empty((np.shape(gyr_cut)[0],1)) # empty array for storing the RMS time series of acceleration data
+        
+        # Normalised Data -> Between -1 and 1
+        # Values smaller than mean will be in [-1,0] and values greater than mean will be [0,1]
+        for ii in range(0,np.shape(gyr_cut)[0]):
+    
+            x_norm = (gyr_cut[ii,0] - x_mean)/(x_max - x_mean)
+            y_norm = (gyr_cut[ii,0] - y_mean)/(y_max - y_mean)
+            z_norm = (gyr_cut[ii,0] - z_mean)/(z_max - z_mean)
+            
+            trans_gyr[ii] = np.sqrt((np.power(x_norm,2) + np.power(y_norm,2) + np.power(z_norm,2))/(3))
+            
+        
+        
+            
     
     #%% Segmenting the data and resampling the cycles
-    segAcc, segGyr = dataSegment(trans_acc[:,0],trans_gyr[:,0])
+    segAcc, segGyr = dataSegment(trans_acc[:,0],trans_gyr[:,0],rot)
 
     
     if i == 6:

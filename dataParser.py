@@ -147,7 +147,7 @@ def dataParser():
             exp.append(experiment)
             
             # Printing the subject numbers and corresponding experiments whose files are accessed for reference
-            print(subjectNum,experiment,acc.shape[0],gyr.shape[0])
+            print(subjectNum,experiment)
             
     # print(AccData)
         
