@@ -28,7 +28,7 @@ coFreqGyr = 1 # Hz
 rot = 'RMS'
 
 #%% Dataframes for accumulating data
-colNames = ['Trials','Sensor','Gait']
+colNames = ['Gait']
 accData = pd.DataFrame(columns = colNames)
 gyrData = pd.DataFrame(columns = colNames)
 # =============================================================================
@@ -341,8 +341,10 @@ for i in range(0,len(acc)):
     
     
     #%% Accumilating the Data
-    accData['Trials'] = accData['Trials'].astype('object')
-    gyrData['Trials'] = gyrData['Trials'].astype('object')
+# =============================================================================
+#     accData['Trials'] = accData['Trials'].astype('object')
+#     gyrData['Trials'] = gyrData['Trials'].astype('object')
+# =============================================================================
     
     
     #%% Removing Malicious Data
@@ -385,12 +387,28 @@ for i in range(0,len(acc)):
             segGyr_nonmal.append(segGyr[ii]) # List containing non-malicious cycles as arrays
     
     
-    accData.at[count,'Trials'] = segAcc_nonmal
+# =============================================================================
+#     accData.at[count,'Trials'] = segAcc_nonmal
+#     
+#     gyrData.at[count,'Trials'] = segGyr_nonmal
+# =============================================================================
     
-    gyrData.at[count,'Trials'] = segGyr_nonmal
+    cnt = 0
+    for ii in range(0,len(segAcc_nonmal)):
+        for jj in range(0,segAcc_nonmal[ii].shape[0]):
+            accData.at[count,cnt] = segAcc_nonmal[ii][jj]
+            cnt = cnt + 1
+            
+    cnt = 0
+    for ii in range(0,len(segGyr_nonmal)):
+        for jj in range(0,segGyr_nonmal[ii].shape[0]):
+            gyrData.at[count,cnt] = segGyr_nonmal[ii][jj]
+            cnt = cnt + 1
     
-    accData.at[count,'Sensor'] = 'Accelerometer'
-    gyrData.at[count,'Sensor'] = 'Gyroscope'
+# =============================================================================
+#     accData.at[count,'Sensor'] = 'Accelerometer'
+#     gyrData.at[count,'Sensor'] = 'Gyroscope'
+# =============================================================================
     
     accData.at[count,'Gait'] = experiments[i]
     gyrData.at[count,'Gait'] = experiments[i]
@@ -404,31 +422,33 @@ for i in range(0,len(acc)):
 # Sample Cycles
 
 # Acceleration
-fig, (axis1,axis2) = plt.subplots(nrows = 2, ncols = 1, figsize = (8,8))
-for i in range(len(accData.at[2,'Trials'])):
-    axis1.plot(accData.at[2,'Trials'][i])
-axis1.title.set_text('Malicious Data Excluded')
-axis1.grid()
-
-for i in range(len(firstsegAcc)):
-    axis2.plot(firstsegAcc[i])
-axis2.title.set_text('Malicious Data Included')
-axis2.grid()
-plt.show()
-
-
-# Gyroscope
-fig, (axis1,axis2) = plt.subplots(nrows = 2, ncols = 1, figsize = (8,8))
-for i in range(len(gyrData.at[2,'Trials'])):
-    axis1.plot(gyrData.at[2,'Trials'][i])
-axis1.title.set_text('Malicious Data Excluded')
-axis1.grid()
-
-for i in range(len(firstsegGyr)):
-    axis2.plot(firstsegGyr[i])
-axis2.title.set_text('Malicious Data Included')
-axis2.grid()
-plt.show()
+# =============================================================================
+# fig, (axis1,axis2) = plt.subplots(nrows = 2, ncols = 1, figsize = (8,8))
+# for i in range(len(accData.at[2,'Trials'])):
+#     axis1.plot(accData.at[2,'Trials'][i])
+# axis1.title.set_text('Malicious Data Excluded')
+# axis1.grid()
+# 
+# for i in range(len(firstsegAcc)):
+#     axis2.plot(firstsegAcc[i])
+# axis2.title.set_text('Malicious Data Included')
+# axis2.grid()
+# plt.show()
+# 
+# 
+# # Gyroscope
+# fig, (axis1,axis2) = plt.subplots(nrows = 2, ncols = 1, figsize = (8,8))
+# for i in range(len(gyrData.at[2,'Trials'])):
+#     axis1.plot(gyrData.at[2,'Trials'][i])
+# axis1.title.set_text('Malicious Data Excluded')
+# axis1.grid()
+# 
+# for i in range(len(firstsegGyr)):
+#     axis2.plot(firstsegGyr[i])
+# axis2.title.set_text('Malicious Data Included')
+# axis2.grid()
+# plt.show()
+# =============================================================================
 #%% acc_cut and gyr_cut are 2D arrays containing the X,Y and Z (excluding the time vector) values of the cut data
 
 # =============================================================================
