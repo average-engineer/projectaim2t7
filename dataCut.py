@@ -38,7 +38,7 @@ def dataCut(acc, gyr, accfreq, gyrfreq): # 2D arrays containing data in all 3D c
     gap2  = np.argmax(diff_peaks[-10:]) # Largest difference index number betwween consecutive peak indices in the last 10 peaks
     gap2  = int(gap2 + np.shape(diff_peaks)[0]-10) # gap2 index number is defined wrt start of the indices 
 
-    if (gap2 + np.shape(diff_peaks)[0]) < 11:
+    if (gap2 + np.shape(diff_peaks)[0]) < 11: # For some datasets, the gap2 index becomes negative
         return accEmp,gyrEmp
     
     else:
