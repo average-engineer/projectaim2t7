@@ -1,12 +1,14 @@
 training:
-    batch_size: 64
+    batch_size: 32
     epochs: 1000
-    learning_rate: 0.001
+    learning_rate: 0.0001
+
 
 input_features:
     -
-        name: trials
-        type: set
+        name: samples
+        type: sequence
+        encoder: rnn
         
     -
         name: sensor

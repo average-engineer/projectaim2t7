@@ -8,6 +8,10 @@ from scipy.signal.ltisys import TransferFunctionDiscrete
 from sklearn.preprocessing import scale
 from sklearn import decomposition
 
+
+def to_str(var):
+    return str(list(np.reshape(np.asarray(var), (1, np.size(var)))[0]))[1:-1]
+
 def filter_data(sensordata, fs=200, fc=5):
     sensordata_filt = np.zeros(sensordata.shape)
     
@@ -43,9 +47,11 @@ def seg_data_acc(trans_df_acc):
     return peaks,diff_peaks
 
 
-column_names = ['trial', 'sensor', 'gait']
+column_names = ['trial', 'sensor', 'gait', 'samples']
 training_data_acc = pd.DataFrame(columns=column_names)
+training_data_gyr = pd.DataFrame(columns=column_names)
 sample_list_acc=[]
+sample_list_gyr=[]
 df = pd.DataFrame()
 gait_list = []
 file_list =[]
@@ -57,7 +63,7 @@ for path in paths:
     splitexp = re.split('_',experiment_name)
     subj=splitexp[0]
     gait=splitexp[1]
-    if not re.search(r'red', gait) and re.search(r'215',subj):
+    if not re.search(r'red', gait):
         # re.search(r'215',subj) or re.search(r'217',subj)
         try:
             file_list.append(experiment_name)
@@ -82,11 +88,11 @@ for path in paths:
                 acc_cut, gyr_cut = cut_data(filter_acc,filter_gyr)
                 
             # PCA
-                # data_gyr = scale(gyr_cut)
-                # pca_gyr = decomposition.PCA(n_components=1)
-                # pca_gyr.fit(data_gyr)
-                # trans_gyr = pca_gyr.transform(data_gyr)
-                # trans_df_gyr = pd.DataFrame(trans_gyr)
+                data_gyr = scale(gyr_cut)
+                pca_gyr = decomposition.PCA(n_components=1)
+                pca_gyr.fit(data_gyr)
+                trans_gyr = pca_gyr.transform(data_gyr)
+                sample_list_gyr.append(trans_gyr)
                 data_acc = scale(acc_cut)
                 pca_acc = decomposition.PCA(n_components=1)
                 pca_acc.fit(data_acc)
@@ -97,7 +103,8 @@ for path in paths:
 
         except:
             pass
-
+# for i in range(len(sample_list_acc)):
+#     print(len(sample_list_acc[i]))
 try:
         
     for k in range(len(file_list)):
@@ -105,16 +112,26 @@ try:
         training_data_acc.at[k,'trial'] = sample_list_acc[k].transpose()
         training_data_acc.at[k,'sensor'] = 'Accelerometer'
         training_data_acc.at[k, 'gait'] = gait_list[k][0]
- 
+        training_data_gyr['trial'] = training_data_gyr['trial'].astype('object')
+        training_data_gyr.at[k,'trial'] = sample_list_gyr[k].transpose()
+        training_data_gyr.at[k,'sensor'] = 'Gyroscope'
+        training_data_gyr.at[k, 'gait'] = gait_list[k][0]
 except:
     pass
-
-training_data_acc['trials'] = [','.join(map(str, l)) for l in training_data_acc['trial']]
+trilist1=[]
+for i in range(len(training_data_acc)):
+    trilist1.append((training_data_acc.at[i,'trial'][0]).tolist())
+    training_data_acc.loc[i,'samples'] = trilist1[i]
 training_data_acc.drop(training_data_acc.columns[0], axis=1, inplace=True)
-# training_data_acc['trials'].to_string(header = True, index = True).split('\n')
-# print(training_data_acc)
-training_data_acc.to_csv('timser_data.csv')
-
+trilist2=[]
+for i in range(len(training_data_gyr)):
+    trilist2.append((training_data_gyr.at[i,'trial'][0]).tolist())
+    training_data_gyr.loc[i,'samples'] = trilist2[i]
+training_data_gyr.drop(training_data_gyr.columns[0], axis=1, inplace=True)
+frames = [training_data_acc,training_data_gyr]
+result = pd.concat(frames)
+# print(result)
+result.to_csv('training_data.csv',index=False, encoding="utf-8",escapechar='\\', doublequote=False)
 
         # Segmenting
             # peaks_acc, diffpeaks_acc = seg_data_acc(trans_df_acc.iloc[1:,0].values.astype(float))
