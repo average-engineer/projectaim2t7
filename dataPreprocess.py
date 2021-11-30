@@ -6,6 +6,9 @@ from scipy.fft import fft, fftfreq, rfft, rfftfreq # For FFT
 import pandas as pd
 from sklearn.preprocessing import scale
 from sklearn import decomposition
+from sklearn.preprocessing import LabelEncoder
+
+
 
 from dataParser import dataParser # importing the function for reading all the csv files
 # Importing data filtering function
@@ -418,8 +421,9 @@ for i in range(0,len(acc)):
     gyr1.append(segGyr_nonmal)
     
     count = count+ 1
+    
         
-# Sample Cycles
+#%% Sample Cycles
 
 # Acceleration
 # =============================================================================
@@ -473,3 +477,15 @@ for i in range(0,len(acc)):
 # plt.legend()
 # # plt.show()
 # =============================================================================
+
+
+
+
+#%% Setting Labels
+label = LabelEncoder()
+accData['label'] = label.fit_transform(accData['Gait'])
+accData.head()
+
+
+
+

@@ -84,6 +84,19 @@ def dataParser():
         experiment = Split2[-1]
         experiment = re.split('0',experiment)
         experiment = experiment[0]
+        
+        # Standardising the experiment names
+        if re.search(r'own',experiment):
+            experiment = 'downstairs'
+          
+        if re.search(r'up',experiment):
+            experiment = 'upstairs'  
+            
+        if re.search(r'or',experiment):
+            experiment = 'normal' 
+        
+        
+        
         Split2 = Split2[0]
         Split3 = re.split('t',Split2)
         subjectNum = Split3[-1]
