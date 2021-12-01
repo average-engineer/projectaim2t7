@@ -36,9 +36,19 @@ def dataParser():
     
     print('Starting Data Parsing')
     
+    # Part record wise sampling and Part subject wise
+    # The subject numbers vary from 150 to 274
+    # The first 101 subjects are taken for training and testing the neural network
+    # The last 25 subject datasets are not fed into the neural network at all
+    # and can be treated as a dataset which is completely unknown to the neural network
+    # Once the model has been trained and tested, we can further validate our model
+    # by just passing the 25 subject data as a new test data into the neural network.
+    # In this way, we do both record wise and subject wise sampling.
+
+    
     # Required Subject IDs -> Which Subject Data are taken
     startSub = 150
-    endSub = 274
+    endSub = 160
     numSub = endSub - startSub + 1
     subjID = list(np.linspace(startSub,endSub,numSub))
     # subjID = ['155','224','257']

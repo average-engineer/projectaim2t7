@@ -16,10 +16,6 @@ def dataSegment(acc,gyr,rot):
         peaksAcc, _ = signal.find_peaks(acc,height = 1.2) # Returns indices of peaks in acceleration data
         peaksGyr, _ = signal.find_peaks(gyr,height = 0.4) # Returns indices of peaks in gyroscope data
     
-# ===============================s==============================================
-#     diff_peaksAcc = np.diff(peaksAcc)
-#     diff_peaksGyr = np.diff(peaksGyr)
-# =============================================================================
     
     # We return a list wherer each element of the list is the individual cycle/sample
     # The data arrays are sliced into multiple cycles on the basis of peak indices obtained
@@ -27,12 +23,8 @@ def dataSegment(acc,gyr,rot):
     # Initialising lists
     segAcc = []
     segGyr = []
-
-# =============================================================================
-#     segAcc = np.empty((peaksAcc.shape[0],100))
-#     segGyr = np.empty((peaksGyr.shape[0],100))
-#     
-# =============================================================================
+    
+    
     jj = 0
     for ii in peaksAcc:
         cycAcc = acc[jj:ii + 1] # Cycle obtained as array
