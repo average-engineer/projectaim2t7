@@ -37,8 +37,8 @@ def dataParser():
     print('Starting Data Parsing')
     
     # Required Subject IDs -> Which Subject Data are taken
-    startSub = 190
-    endSub = 200
+    startSub = 150
+    endSub = 274
     numSub = endSub - startSub + 1
     subjID = list(np.linspace(startSub,endSub,numSub))
     # subjID = ['155','224','257']
@@ -57,6 +57,9 @@ def dataParser():
     
     # Empty List for storing experiment names
     exp = []
+    
+    # Empty List for storing subject names
+    subjNum = []
     
     
     for folder in folders:
@@ -159,10 +162,13 @@ def dataParser():
             # Appending experiment names to the experiment list
             exp.append(experiment)
             
+            # Appending subject names to the subject list
+            subjNum.append(subjectNum)
+            
             # Printing the subject numbers and corresponding experiments whose files are accessed for reference
             print(subjectNum,experiment)
             
     # print(AccData)
         
     print('Ending Data Parsing')
-    return AccData, GyrData, exp
+    return AccData, GyrData, exp, subjNum
