@@ -382,66 +382,6 @@ def dataPreprocess():
         # Data stores alternatively as lists
         acc1.append(segAcc_nonmal)
         gyr1.append(segGyr_nonmal)
-        
-        # count = count+ 1
-        
-            
-    #%% Sample Cycles
-    
-    # Acceleration
-    # =============================================================================
-    # fig, (axis1,axis2) = plt.subplots(nrows = 2, ncols = 1, figsize = (8,8))
-    # for i in range(len(accData.at[2,'Trials'])):
-    #     axis1.plot(accData.at[2,'Trials'][i])
-    # axis1.title.set_text('Malicious Data Excluded')
-    # axis1.grid()
-    # 
-    # for i in range(len(firstsegAcc)):
-    #     axis2.plot(firstsegAcc[i])
-    # axis2.title.set_text('Malicious Data Included')
-    # axis2.grid()
-    # plt.show()
-    # 
-    # 
-    # # Gyroscope
-    # fig, (axis1,axis2) = plt.subplots(nrows = 2, ncols = 1, figsize = (8,8))
-    # for i in range(len(gyrData.at[2,'Trials'])):
-    #     axis1.plot(gyrData.at[2,'Trials'][i])
-    # axis1.title.set_text('Malicious Data Excluded')
-    # axis1.grid()
-    # 
-    # for i in range(len(firstsegGyr)):
-    #     axis2.plot(firstsegGyr[i])
-    # axis2.title.set_text('Malicious Data Included')
-    # axis2.grid()
-    # plt.show()
-    # =============================================================================
-    #%% acc_cut and gyr_cut are 2D arrays containing the X,Y and Z (excluding the time vector) values of the cut data
-    
-    # =============================================================================
-    # fig,(axis1,axis2,axis3) = plt.subplots(nrows = 3, ncols = 1, figsize = (7,7))
-    # axis1.plot(acc_cut[:,0])
-    # axis1.grid()
-    # 
-    # axis2.plot(acc_cut[:,1])
-    # axis2.grid()
-    # 
-    # axis3.plot(acc_cut[:,2])
-    # axis3.grid()
-    # =============================================================================
-    
-    
-    #%%
-        
-    # =============================================================================
-    # fig = plt.figure(figsize = (10,10))
-    # plt.plot(trans_acc,label = 'PCATime Series')
-    # # plt.plot(acc_rms, label = 'RMS Time Series')
-    # plt.legend()
-    # # plt.show()
-    # =============================================================================
-    
-    
     
     
     #%% Setting Labels
