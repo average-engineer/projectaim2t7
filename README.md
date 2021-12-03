@@ -1,5 +1,7 @@
 # projectaim2t7
 <h2>Current data discrepencies</h2>
 
-* Raj's data not comma delimited properly (data not getting splitted column wise properly)
-* Vibhav's 2nd upstairs trial has only recorded 25 seconds worth of data (minor issue), rest all datasets atleast for group 14 seem to be 30 seconds only
+**Issues**:
+
+* When all subject folders are read, there is some error being shown in reading one of the gyroscope csv files, dont exactly know which one
+* Since the naming of all folders is not consistent across the dataset, the all experiment names are not obtained properly
